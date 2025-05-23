@@ -1,0 +1,158 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX_MEMBERS 5
+#define MAX_LEN 50
+#define NUM_TESTS 7
+
+// Member info
+char memberNames[MAX_MEMBERS][MAX_LEN] = {
+    "Zaphod Beeblebrox",
+    "Trillian Astra",
+    "Ford Prefect",
+    "Arthur Dent",
+    "Marvin"
+};
+
+char memberNicknames[MAX_MEMBERS][MAX_LEN] = {
+    "Zaphod",
+    "Trill",
+    "Ford",
+    "Arthur",
+    "Marv"
+};
+
+// Test categories
+const char *testNames[NUM_TESTS] = {
+    "1-Mile Run (min)",
+    "Speed Sprint (sec)",
+    "Push-ups (min for 30)",
+    "Squats (min for 50)",
+    "Arm Strength (min for 50)",
+    "Swimming (min for 400m)",
+    "Weightlifting (x BW)"
+};
+
+// Health scores [member][test]
+float health_scores[MAX_MEMBERS][NUM_TESTS];
+
+// Enter fitness data
+void setHealth() {
+    int i, j;
+    printf("\n=== Enter Fitness Data ===\n");
+    for (i = 0; i < MAX_MEMBERS; i++) {
+        printf("Enter 7 scores for %s (separated by spaces):\n", memberNicknames[i]);
+        for (j = 0; j < NUM_TESTS; j++) {
+            printf("  %s: ", testNames[j]);
+            scanf("%f", &health_scores[i][j]);
+        }
+    }
+    printf("All data recorded.\n");
+}
+
+// View fitness data
+void getHealth() {
+    int option, i, j, test_index;
+    char nickname[MAX_LEN];
+
+    printf("\n=== View Fitness Data ===\n");
+    printf("1. View all data\n");
+    printf("2. View one member's data\n");
+    printf("3. View one test for one member\n");
+    printf("Select option: ");
+    scanf("%d", &option);
+
+    if (option == 1) {
+        for (i = 0; i < MAX_MEMBERS; i++) {
+            printf("\n%s (%s):\n", memberNames[i], memberNicknames[i]);
+            for (j = 0; j < NUM_TESTS; j++) {
+                printf("  %s: %.2f\n", testNames[j], health_scores[i][j]);
+            }
+        }
+    } else if (option == 2) {
+        printf("Enter member nickname: ");
+        scanf("%s", nickname);
+        for (i = 0; i < MAX_MEMBERS; i++) {
+            if (strcmp(memberNicknames[i], nickname) == 0) {
+                printf("\n%s (%s):\n", memberNames[i], memberNicknames[i]);
+                for (j = 0; j < NUM_TESTS; j++) {
+                    printf("  %s: %.2f\n", testNames[j], health_scores[i][j]);
+                }
+                return;
+            }
+        }
+        printf("Member not found.\n");
+    } else if (option == 3) {
+        printf("Enter member nickname: ");
+        scanf("%s", nickname);
+        printf("Enter test number (1-7): ");
+        scanf("%d", &test_index);
+        if (test_index < 1 || test_index > NUM_TESTS) {
+            printf("Invalid test number.\n");
+            return;
+        }
+        for (i = 0; i < MAX_MEMBERS; i++) {
+            if (strcmp(memberNicknames[i], nickname) == 0) {
+                printf("%s's %s result: %.2f\n",
+                    nickname, testNames[test_index - 1],
+                    health_scores[i][test_index - 1]);
+                return;
+            }
+        }
+        printf("Member not found.\n");
+    } else {
+        printf("Invalid option.\n");
+    }
+}
+
+// Training menu
+void trainingMenu() {
+    int choice;
+    while (1) {
+        printf("\n=== TRAINING MENU ===\n");
+        printf("1. Enter Fitness Data\n");
+        printf("2. View Fitness Data\n");
+        printf("0. Back\n");
+        printf("Choose: ");
+        scanf("%d", &choice);
+
+        if (choice == 0)
+            break;
+        else if (choice == 1)
+            setHealth();
+        else if (choice == 2)
+            getHealth();
+        else
+            printf("Invalid choice.\n");
+    }
+}
+
+// Main menu
+int main() {
+    int menu;
+    while (1) {
+        printf("\n=== MAIN MENU ===\n");
+        printf("1. Audition Management\n");
+        printf("2. Training\n");
+        printf("3. Debut\n");
+        printf("0. Exit\n");
+        printf("Select menu: ");
+        scanf("%d", &menu);
+
+        if (menu == 0) {
+            printf("Exiting...\n");
+            break;
+        } else if (menu == 1) {
+            printf("Audition Management not implemented yet.\n");
+        } else if (menu == 2) {
+            trainingMenu();
+        } else if (menu == 3) {
+            printf("Debut not implemented yet.\n");
+        } else {
+            printf("Invalid option.\n");
+        }
+    }
+
+    return 0;
+}
