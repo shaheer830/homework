@@ -6,7 +6,7 @@
 #define MAX_LEN 50
 #define NUM_TESTS 7
 
-// Member info
+
 char memberNames[MAX_MEMBERS][MAX_LEN] = {
     "Zaphod Beeblebrox",
     "Trillian Astra",
@@ -23,7 +23,7 @@ char memberNicknames[MAX_MEMBERS][MAX_LEN] = {
     "Marv"
 };
 
-// Test categories
+
 const char *testNames[NUM_TESTS] = {
     "1-Mile Run (min)",
     "Speed Sprint (sec)",
@@ -34,10 +34,9 @@ const char *testNames[NUM_TESTS] = {
     "Weightlifting (x BW)"
 };
 
-// Health scores [member][test]
+
 float health_scores[MAX_MEMBERS][NUM_TESTS];
 
-// Enter fitness data
 void setHealth() {
     int i, j;
     printf("\n=== Enter Fitness Data ===\n");
@@ -51,7 +50,6 @@ void setHealth() {
     printf("All data recorded.\n");
 }
 
-// View fitness data
 void getHealth() {
     int option, i, j, test_index;
     char nickname[MAX_LEN];
@@ -106,7 +104,6 @@ void getHealth() {
     }
 }
 
-// Training menu
 void trainingMenu() {
     int choice;
     while (1) {
@@ -128,7 +125,7 @@ void trainingMenu() {
     }
 }
 
-// Main menu
+
 int main() {
     int menu;
     while (1) {
