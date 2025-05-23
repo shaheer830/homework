@@ -59,7 +59,7 @@ int main() {
                     continue;
                 }
 
-                // Prerequisite check
+               
                 if (idx >= 2 && (trainingResults[0] != 'P' || trainingResults[1] != 'P')) {
                     printf("You must complete stages 1 and 2 first.\n");
                     continue;
