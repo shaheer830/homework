@@ -1,0 +1,93 @@
+#include <stdio.h>
+
+char trainingResults[8] = {0};
+
+void showMainMenu() {
+    printf("\n=== MAIN MENU ===\n");
+    printf("1. Audition Management\n");
+    printf("2. Training\n");
+    printf("3. Debut\n");
+    printf("0. Quit\n");
+    printf("Select an option: ");
+}
+
+void showTrainingMenu() {
+    printf("\n=== TRAINING MENU ===\n");
+    printf("1. Physical Strength & Knowledge [%c]\n", trainingResults[0] ? trainingResults[0] : '-');
+    printf("2. Self-Management & Teamwork [%c]\n", trainingResults[1] ? trainingResults[1] : '-');
+    printf("3. Language & Pronunciation [%c]\n", trainingResults[2] ? trainingResults[2] : '-');
+    printf("4. Vocal [%c]\n", trainingResults[3] ? trainingResults[3] : '-');
+    printf("5. Dance [%c]\n", trainingResults[4] ? trainingResults[4] : '-');
+    printf("6. Visual & Image [%c]\n", trainingResults[5] ? trainingResults[5] : '-');
+    printf("7. Acting & Stage Performance [%c]\n", trainingResults[6] ? trainingResults[6] : '-');
+    printf("8. Fan Communication [%c]\n", trainingResults[7] ? trainingResults[7] : '-');
+    printf("0. Return to Main Menu\n");
+    printf("Select a stage: ");
+}
+
+int main() {
+    int mainChoice, stageChoice;
+    char input;
+
+    while (1) {
+        showMainMenu();
+        scanf(" %d", &mainChoice);
+
+        if (mainChoice == 0) {
+            printf("Exiting program.\n");
+            break;
+        }
+
+        if (mainChoice == 1) {
+            printf("Audition Management selected.\n");
+        } else if (mainChoice == 2) {
+            while (1) {
+                showTrainingMenu();
+                scanf(" %d", &stageChoice);
+
+                if (stageChoice == 0) break;
+
+                if (stageChoice < 1 || stageChoice > 8) {
+                    printf("Invalid stage number.\n");
+                    continue;
+                }
+
+                int idx = stageChoice - 1;
+
+                if (trainingResults[idx]) {
+                    printf("This stage is already completed.\n");
+                    continue;
+                }
+
+                // Prerequisite check
+                if (idx >= 2 && (trainingResults[0] != 'P' || trainingResults[1] != 'P')) {
+                    printf("You must complete stages 1 and 2 first.\n");
+                    continue;
+                }
+
+                printf("Would you like to enter the evaluation result? (Y/N): ");
+                scanf(" %c", &input);
+                input = toupper(input);
+
+                if (input == 'Y') {
+                    printf("Did you complete the training and pass? (Y/N): ");
+                    scanf(" %c", &input);
+                    input = toupper(input);
+                    if (input == 'Y') {
+                        trainingResults[idx] = 'P';
+                        printf("Marked as Passed.\n");
+                    } else {
+                        trainingResults[idx] = 'F';
+                        printf("Marked as Failed.\n");
+                    }
+                }
+            }
+        } else if (mainChoice == 3) {
+            printf("Debut selected.\n");
+        } else {
+            printf("Invalid option. Try again.\n");
+        }
+    }
+
+    return 0;
+}
