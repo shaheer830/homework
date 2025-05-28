@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 20
+#define QUIZ_COUNT 5
+
+typedef struct {
+    char *hangul;
+    char *english;
+    char *pronunciation;
+    char type; 
+} HangulChar;
+
+typedef struct {
+    char name[50];
+    char challenge[3]; 
+    int score;
+    int attempts;
+} Result;
+
+
+HangulChar hangulList[] = {
+    {"ㄱ", "g", "giyeok", 'C'}, {"ㄴ", "n", "nieun", 'C'},
+    {"ㅏ", "a", "a", 'V'},      {"ㅓ", "eo", "eo", 'V'}
+};
+int total = 4;
+
+Result resultList[10];
+int resultCount = 0;
+
+void askUser(char *prompt, char *input) {
+    printf("%s", prompt);
+    scanf("%s", input);
+}
+
+void updateResult(char *name, char *type, int score) {
+    for (int i = 0; i < resultCount; i++) {
+        if (strcmp(resultList[i].name, name) == 0 && strcmp(resultList[i].challenge, type) == 0) {
+            resultList[i].score += score;
+            resultList[i].attempts++;
+            return;
+        }
+    }
+    strcpy(resultList[resultCount].name, name);
+    strcpy(resultList[resultCount].challenge, type);
+    resultList[resultCount].score = score;
+    resultList[resultCount].attempts = 1;
+    resultCount++;
+}
+
+
+void playKor2Eng(char *name) {
+    char input[50];
+    int score = 0;
+    printf("\n--- Hangul to English ---\n");
+    for (int i = 0; i < QUIZ_COUNT; i++) {
+        int idx = rand() % total;
+        printf("Q%d: %s → ", i+1, hangulList[idx].hangul);
+        scanf("%s", input);
+        if (strcmp(input, hangulList[idx].english) == 0) {
+            score += 10;
+            printf("Correct!\n");
+        } else {
+            printf("Wrong! Answer: %s\n", hangulList[idx].english);
+        }
+    }
+    updateResult(name, "KE", score);
+}
+
+void playEng2Kor(char *name) {
+    char input[50];
+    int score = 0;
+    printf("\n--- English to Hangul ---\n");
+    for (int i = 0; i < QUIZ_COUNT; i++) {
+        int idx = rand() % total;
+        printf("Q%d: %s (%s) → ", i+1, hangulList[idx].english, hangulList[idx].pronunciation);
+        scanf("%s", input);
+        if (strcmp(input, hangulList[idx].hangul) == 0) {
+            score += 10;
+            printf("Correct!\n");
+        } else {
+            printf("Wrong! Answer: %s\n", hangulList[idx].hangul);
+        }
+    }
+    updateResult(name, "EK", score);
+}
+
+void showResults() {
+    printf("\n--- Results ---\n");
+    for (int i = 0; i < resultCount; i++) {
+        int avg = resultList[i].score / resultList[i].attempts;
+        printf("%s - %s: Avg %d, Attempts %d\n",
+               resultList[i].name,
+               resultList[i].challenge,
+               avg,
+               resultList[i].attempts);
+    }
+}
+
+void learnHangul() {
+    char name[50];
+    int choice;
+    askUser("Enter your name: ", name);
+
+    while (1) {
+        printf("\n[1] Hangul to English\n[2] English to Hangul\n[3] View Results\n[0] Exit\nChoose: ");
+        scanf("%d", &choice);
+
+        if (choice == 1)
+            playKor2Eng(name);
+        else if (choice == 2)
+            playEng2Kor(name);
+        else if (choice == 3)
+            showResults();
+        else
+            break;
+    }
+}
+
+int main() {
+    srand(time(NULL));
+    learnHangul();
+    return 0;
+}
