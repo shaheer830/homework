@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <string.h>
+
+#define TOTAL_QUESTIONS 3
+
+typedef struct {
+    int id;
+    char question[100];
+    char correct;
+} Question;
+
+typedef struct {
+    char name[50];
+    char nationality[20];
+    int score;
+    char pass;
+} Trainee;
+
+typedef struct {
+    int questionId;
+    char result; 
+} QuizAnswer;
+
+int isAnswerCorrect(Question *q, char answer) {
+    return (answer == q->correct) ? 1 : 0;
+}
+
+void runQuiz() {
+    
+    Trainee t;
+    strcpy(t.name, "Liam Chen");
+    strcpy(t.nationality, "Canadian");
+    t.score = 0;
+    t.pass = 'N';
+
+    if (strcmp(t.nationality, "Korean") == 0) {
+        printf("Korean trainees cannot take the test.\n");
+        return;
+    }
+
+    Question q1 = {1, "What is 'hello' in Korean?", 'A'};
+    Question q2 = {2, "What does '감사합니다' mean?", 'C'};
+    Question q3 = {3, "Choose a Korean vowel.", 'B'};
+
+    Question questions[TOTAL_QUESTIONS] = {q1, q2, q3};
+    QuizAnswer answers[TOTAL_QUESTIONS];
+
+    for (int i = 0; i < TOTAL_QUESTIONS; i++) {
+        printf("Q%d: %s\n", questions[i].id, questions[i].question);
+        printf("A) Option A  B) Option B  C) Option C\n");
+        printf("Your answer: ");
+
+        char userAnswer;
+        scanf(" %c", &userAnswer);
+
+        answers[i].questionId = questions[i].id;
+        if (isAnswerCorrect(&questions[i], userAnswer)) {
+            answers[i].result = 'O';
+            t.score += 20;
+        } else {
+            answers[i].result = 'X';
+        }
+    }
+
+    if (t.score >= 60) {
+        t.pass = 'Y';
+    }
+
+    
+    printf("\n-- Result --\n");
+    printf("Name: %s\n", t.name);
+    printf("Score: %d\n", t.score);
+    printf("Pass: %c\n", t.pass);
+    for (int i = 0; i < TOTAL_QUESTIONS; i++) {
+        printf("Q%d: %c\n", answers[i].questionId, answers[i].result);
+    }
+}
+
+
+int main() {
+    runQuiz();
+    return 0;
+}
