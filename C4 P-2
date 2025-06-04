@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#define MAX 5
+
+typedef struct {
+    char hangul[4];
+    char eng[6];
+    char pron[16];
+    char type; // 'C' or 'V'
+} Jamo;
+
+typedef struct {
+    char name[30];
+    char challenge[3];
+    int score;
+    int attempts;
+} Result;
+
+Jamo jamos[] = {
+    {"ㄱ", "g", "giyeok", 'C'}, {"ㄴ", "n", "nieun", 'C'}, {"ㄷ", "d", "digeut", 'C'},
+    {"ㅁ", "m", "mieum", 'C'}, {"ㅂ", "b", "bieup", 'C'}, {"ㅅ", "s", "siot", 'C'},
+    {"ㅏ", "a", "a", 'V'}, {"ㅑ", "ya", "ya", 'V'}, {"ㅓ", "eo", "eo", 'V'},
+    {"ㅗ", "o", "o", 'V'}, {"ㅜ", "u", "u", 'V'}, {"ㅣ", "i", "i", 'V'}
+};
+int jamoCount = 12;
+Result results[10];
+int resultCount = 0;
+
+// Play KE or EK quiz
+void playGame(char *name, char *type, char jamoType) {
+    int used[12] = {0}, count = 0, score = 0;
+    srand(time(NULL));
+    printf("\n--- Quiz Start (%s) ---\n", type);
+
+    while (count < MAX) {
+        int i = rand() % jamoCount;
+        if (used[i] || jamos[i].type != jamoType) continue;
+
+        used[i] = 1;
+        count++;
+
+        if (strcmp(type, "KE") == 0) {
+            char a[6], b[16];
+            printf("Q%d. %s → Enter eng,pron: ", count, jamos[i].hangul);
+            scanf("%s %s", a, b);
+            if (strcmp(a, jamos[i].eng) == 0 && strcmp(b, jamos[i].pron) == 0)
+                score += 10;
+        } else {
+            char h[4];
+            printf("Q%d. %s (%s) → Enter Hangul: ", count, jamos[i].eng, jamos[i].pron);
+            scanf("%s", h);
+            if (strcmp(h, jamos[i].hangul) == 0)
+                score += 10;
+        }
+    }
+
+    // Save result
+    for (int i = 0; i < resultCount; i++) {
+        if (strcmp(results[i].name, name) == 0 && strcmp(results[i].challenge, type) == 0) {
+            results[i].score += score;
+            results[i].attempts++;
+            return;
+        }
+    }
+    strcpy(results[resultCount].name, name);
+    strcpy(results[resultCount].challenge, type);
+    results[resultCount].score = score;
+    results[resultCount].attempts = 1;
+    resultCount++;
+}
+
+// View results
+void viewResults() {
+    printf("\n--- Results ---\n");
+    for (int i = 0; i < resultCount; i++) {
+        printf("Name: %s | Type: %s | Avg: %d\n", results[i].name, results[i].challenge,
+               results[i].score / results[i].attempts);
+    }
+}
+
+// Menu
+void learnHangul() {
+    char name[30];
+    int mainChoice, subChoice;
+    printf("Enter your name: ");
+    scanf("%s", name);
+
+    while (1) {
+        printf("\n1. Hangul to English\n2. English to Hangul\n3. View Results\n0. Back\nChoose: ");
+        scanf("%d", &mainChoice);
+        if (mainChoice == 0) break;
+
+        if (mainChoice == 3) {
+            viewResults();
+            continue;
+        }
+
+        printf("1. Consonants\n2. Vowels\nChoose type: ");
+        scanf("%d", &subChoice);
+        char t = (subChoice == 1) ? 'C' : 'V';
+
+        if (mainChoice == 1)
+            playGame(name, "KE", t);
+        else if (mainChoice == 2)
+            playGame(name, "EK", t);
+    }
+}
+
+// Main
+int main() {
+    while (1) {
+        int choice;
+        printf("\n[Hangul Jamo Learning]\n1. Start Learning\n0. Exit\nChoose: ");
+        scanf("%d", &choice);
+        if (choice == 1)
+            learnHangul();
+        else
+            break;
+    }
+    return 0;
+}
