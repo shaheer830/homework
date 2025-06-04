@@ -1,0 +1,120 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+
+#define TOTAL 10
+#define QUIZ 5
+
+typedef struct {
+    int id;
+    char question[100];
+    char answer[100];
+} KoreanQuestion;
+
+typedef struct {
+    int id;
+    char correctness; 
+} QuizAnswer;
+
+typedef struct {
+    char name[50];
+    char nickname[50];
+    char nationality[50];
+    int score;
+    char pass[10];
+} Trainee;
+
+KoreanQuestion questions[TOTAL] = {
+    {1, "What is the Korean word for 'Thank you'?", "고맙습니다"},
+    {2, "How do you say 'Hello' in Korean?", "안녕하세요"},
+    {3, "What is the Korean term for 'Love'?", "사랑"},
+    {4, "Where is the capital of South Korea?", "서울"},
+    {5, "What is the Korean word for 'water'?", "물"},
+    {6, "What is the Korean word for 'friend'?", "친구"},
+    {7, "Which Korean dish is famous for its mixed rice and vegetables?", "비빔밥"},
+    {8, "What is the Korean word for 'school'?", "학교"},
+    {9, "What is the Korean word for 'family'?", "가족"},
+    {10, "Which is not a public holiday in Korea? (Chuseok, Seollal, White Day)", "화이트 데이"}
+};
+
+QuizAnswer answers[QUIZ];
+Trainee trainee;
+
+int isAnswer(int qid, char *input) {
+    for (int i = 0; i < TOTAL; i++) {
+        if (questions[i].id == qid) {
+            if (strcmp(questions[i].answer, input) == 0)
+                return 1;
+        }
+    }
+    return 0;
+}
+
+void selectRandomTaker() {
+    printf("Enter your name: ");
+    scanf(" %[^\n]", trainee.name);
+    printf("Enter your nickname: ");
+    scanf(" %[^\n]", trainee.nickname);
+    printf("Enter your nationality: ");
+    scanf(" %[^\n]", trainee.nationality);
+
+    if (strcmp(trainee.nationality, "Korean") == 0) {
+        printf("Sorry, Korean nationals cannot take the quiz.\n");
+        exit(0);
+    }
+
+    printf("Welcome, {%s}, to the Korean quiz session!\n", trainee.name);
+}
+
+void serveQuiz() {
+    int used[TOTAL] = {0};
+    int totalScore = 0;
+
+    printf("\nQuiz starts in 30 seconds...\n");
+    sleep(30);
+
+    srand(time(NULL));
+
+    for (int i = 0; i < QUIZ; i++) {
+        int index;
+        do {
+            index = rand() % TOTAL;
+        } while (used[index]);
+        used[index] = 1;
+
+        KoreanQuestion *q = &questions[index];
+        char input[100];
+        printf("\nQ%d: %s\nAnswer: ", i + 1, q->question);
+        scanf(" %[^\n]", input);
+
+        answers[i].id = q->id;
+        if (isAnswer(q->id, input)) {
+            answers[i].correctness = 'O';
+            totalScore += 20;
+        } else {
+            answers[i].correctness = 'X';
+        }
+    }
+
+    trainee.score = totalScore;
+    strcpy(trainee.pass, totalScore >= 80 ? "PASS" : "FAIL");
+
+    printf("\n--- Result ---\n");
+    for (int i = 0; i < QUIZ; i++) {
+        printf("Question ID %d: %c\n", answers[i].id, answers[i].correctness);
+    }
+    printf("Score: %d\n", trainee.score);
+    printf("Status: %s\n", trainee.pass);
+}
+
+void testKoreanLang() {
+    selectRandomTaker();
+    serveQuiz();
+}
+
+int main() {
+    testKoreanLang();
+    return 0;
+}
