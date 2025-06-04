@@ -1,0 +1,184 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define MAX 5
+#define NUM_SENTENCES 5
+#define WORDS 15
+#define LEN 20
+
+typedef struct
+{
+    char english[200];
+    char korean[200];
+} Sentence;
+
+typedef struct
+{
+    char name[50];
+    int score;
+    int attempted;
+} Learner;
+
+Sentence sentences[NUM_SENTENCES] = {
+    {"I eat breakfast every morning.", "나는 매일 아침 아침을 먹는다."},
+    {"She goes to school by bus.", "그녀는 버스로 학교에 간다."},
+    {"They play soccer in the park.", "그들은 공원에서 축구를 한다."},
+    {"He studies Korean grammar.", "그는 한국어 문법을 공부한다."},
+    {"We watch movies on weekends.", "우리는 주말에 영화를 본다."}};
+
+Learner learners[MAX] = {
+    {"min", 0, 0},
+    {"hana", 0, 0},
+    {"kai", 0, 0},
+    {"lee", 0, 0},
+    {"sun", 0, 0}};
+
+int findLearner(char[]);
+void composeSentences(int);
+void printScores(int);
+void splitWords(char[], char words[WORDS][LEN], int *);
+void selectionSort(char words[WORDS][LEN], int);
+void swap(char *, char *);
+
+int main()
+{
+    srand(time(NULL));
+    char name[50];
+    int index = -1, tries = 0;
+
+    printf("Enter your nickname: ");
+    while (tries < 3 && index == -1)
+    {
+        scanf("%s", name);
+        index = findLearner(name);
+        if (index == -1 && ++tries < 3)
+            printf("Not found. Try again: ");
+    }
+
+    if (index == -1)
+    {
+        printf("Too many failed attempts.\n");
+        return 0;
+    }
+
+    int option;
+    printf("1. Compose Korean Sentences\n2. Check Scores\nChoice: ");
+    scanf("%d", &option);
+
+    if (option == 1)
+        composeSentences(index);
+    else if (option == 2)
+        printScores(index);
+    else
+        printf("Exiting.\n");
+
+    return 0;
+}
+
+int findLearner(char name[])
+{
+    for (int i = 0; i < MAX; i++)
+    {
+        if (strcmp(learners[i].name, name) == 0)
+            return i;
+    }
+    return -1;
+}
+
+void composeSentences(int idx)
+{
+    int used[NUM_SENTENCES] = {0};
+    int score = 0;
+
+    for (int i = 0; i < 3; i++)
+    {
+        int r;
+        do
+        {
+            r = rand() % NUM_SENTENCES;
+        } while (used[r]);
+        used[r] = 1;
+
+        char words[WORDS][LEN];
+        int count = 0;
+        splitWords(sentences[r].korean, words, &count);
+        selectionSort(words, count);
+
+        printf("\nEnglish: %s\n", sentences[r].english);
+        printf("Korean words: ");
+        for (int j = 0; j < count; j++)
+            printf("%s ", words[j]);
+        printf("\nYour sentence: ");
+
+        char input[200];
+        getchar();
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input, "\n")] = 0;
+
+        if (strcmp(input, sentences[r].korean) == 0)
+        {
+            printf("Correct!\n");
+            score += 20;
+        }
+        else
+        {
+            printf("Incorrect. Answer: %s\n", sentences[r].korean);
+        }
+    }
+
+    learners[idx].score += score;
+    learners[idx].attempted = 1;
+    printf("Your total score: %d\n", learners[idx].score);
+}
+
+void printScores(int idx)
+{
+    if (!learners[idx].attempted)
+    {
+        printf("You need to play first.\n");
+        return;
+    }
+
+    printf("\n--- Your Score ---\n");
+    printf("%s: %d points\n", learners[idx].name, learners[idx].score);
+
+    printf("\n--- All Scores ---\n");
+    for (int i = 0; i < MAX; i++)
+        printf("%s: %d\n", learners[i].name, learners[i].score);
+}
+
+void splitWords(char line[], char words[WORDS][LEN], int *count)
+{
+    char temp[200];
+    strcpy(temp, line);
+    char *token = strtok(temp, " ");
+    int i = 0;
+    while (token != NULL)
+    {
+        strcpy(words[i++], token);
+        token = strtok(NULL, " ");
+    }
+    *count = i;
+}
+
+void selectionSort(char words[WORDS][LEN], int n)
+{
+    for (int i = 0; i < n - 1; i++)
+    {
+        int min = i;
+        for (int j = i + 1; j < n; j++)
+        {
+            if (strcmp(words[j], words[min]) < 0)
+                min = j;
+        }
+        if (min != i)
+        {
+            char temp[LEN];
+            strcpy(temp, words[i]);
+            strcpy(words[i], words[min]);
+            strcpy(words[min], temp);
+        }
+    }
+}
